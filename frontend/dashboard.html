@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Face AI Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #111;
+            color: white;
+            text-align: center;
+        }
+
+        #stream {
+            border: 3px solid white;
+            margin-top: 20px;
+        }
+
+        #unknown img {
+            margin: 5px;
+            border: 2px solid #fff;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Face AI Dashboard</h1>
+
+    <img id="stream" src="/video" width="700">
+
+    <br><br>
+
+    <input id="personName" placeholder="Enter Name">
+
+    <button onclick="captureFace()">Add Known Face</button>
+
+    <video id="camera" autoplay style="display:none"></video>
+
+    <h2>Recent Unknown Faces</h2>
+
+    <div id="unknown"></div>
+
+    <script>
+
+        const video = document.getElementById("camera")
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => { video.srcObject = stream })
+
+        async function captureFace() {
+
+            let name = document.getElementById("personName").value
+
+            if (!name) {
+                alert("Enter name")
+                return
+            }
+
+            let images = []
+
+            for (let i = 0; i < 40; i++) {
+
+                let canvas = document.createElement("canvas")
+
+                canvas.width = 640
+                canvas.height = 480
+
+                let ctx = canvas.getContext("2d")
+
+                ctx.drawImage(video, 0, 0, 640, 480)
+
+                let blob = await new Promise(r => canvas.toBlob(r, "image/jpeg"))
+
+                images.push(blob)
+
+                await new Promise(r => setTimeout(r, 120))
+
+            }
+
+            let formData = new FormData()
+
+            formData.append("name", name)
+
+            images.forEach(img => formData.append("images", img))
+
+            await fetch("/api/add-known-face", { method: "POST", body: formData })
+
+            alert("Training images saved")
+
+        }
+
+        async function loadUnknown() {
+
+            let res = await fetch("/api/unknown_faces")
+
+            let data = await res.json()
+
+            let box = document.getElementById("unknown")
+
+            box.innerHTML = ""
+
+            data.forEach(f => {
+
+                let img = document.createElement("img")
+
+                img.src = "/data/unknown_faces/" + f
+
+                img.width = 100
+
+                box.appendChild(img)
+
+            })
+
+        }
+
+        setInterval(loadUnknown, 3000)
+
+        loadUnknown()
+
+    </script>
+
+</body>
+
+</html>
