@@ -1,5 +1,5 @@
-fastapi
-uvicorn
+fastapi==0.110.0
+uvicorn==0.29.0
 python-multipart
 
 opencv-python-headless
@@ -8,9 +8,6 @@ pillow
 
 deepface
 faiss-cpu
-
-tensorflow
-keras
 
 mtcnn
 retina-face
@@ -22,5 +19,3 @@ scikit-learn
 python-dotenv
 langchain
 openai
-n8n
-requests
