@@ -1,21 +1,78 @@
-fastapi==0.110.0
-uvicorn==0.29.0
+# ══════════════════════════════════════════════════════════════
+#  FaceAI System — Requirements (VERIFIED WORKING)
+#  Platform : Mac Apple Silicon (M1/M2/M3), Python 3.9
+#  TF backend: CPU only (tensorflow-metal dropped — caused
+#              libmetal_plugin.dylib crash when tf version
+#              was bumped by retina-face/mtcnn deps)
+#  Future    : Jetson → swap tensorflow for NVIDIA wheel,
+#              faiss-cpu stays the same
+# ══════════════════════════════════════════════════════════════
+#
+#  CRITICAL INSTALL ORDER — do NOT just pip install -r, follow steps:
+#
+#  Step 1:  pip install tensorflow==2.16.2 tf-keras==2.16.0
+#  Step 2:  pip install numpy==1.26.4 --force-reinstall
+#  Step 3:  pip install opencv-python-headless==4.9.0.80
+#  Step 4:  pip install fastapi "uvicorn[standard]" python-multipart faiss-cpu requests
+#  Step 5:  pip install retina-face mtcnn --no-deps
+#  Step 6:  pip install lightdsa lightphe
+#  Step 7:  pip install Pillow tqdm pandas gdown fire gunicorn flask flask-cors
+#  Step 8:  pip install deepface --no-deps
+#  Step 9:  pip install numpy==1.26.4 --force-reinstall
+#  Step 10: pip uninstall opencv-python -y   (remove if retina-face pulled it in)
+#
+#  Why --no-deps on deepface/retina-face/mtcnn:
+#    These packages list opencv-python and tensorflow>=1.9 as deps,
+#    which causes pip to upgrade tensorflow to 2.20 and numpy to 2.x,
+#    breaking the entire stack. Installing --no-deps bypasses this.
+#
+#  Why no tensorflow-metal:
+#    tensorflow-metal==1.2.0 only works with tensorflow==2.16.2 exactly.
+#    retina-face's dep resolver upgrades tf to 2.20, which breaks the
+#    metal plugin (libmetal_plugin.dylib can't find _pywrap_tensorflow_internal.so).
+#    CPU inference on M-series Mac is fast enough for single-camera use.
+#
+# ══════════════════════════════════════════════════════════════
+
+# ── Web framework ──
+fastapi
+uvicorn[standard]
 python-multipart
 
-opencv-python-headless
-numpy
-pillow
+# ── TensorFlow (CPU, pinned — do NOT upgrade) ──
+tensorflow==2.16.2
+tf-keras==2.16.0
 
+# ── numpy (pinned — must stay <2.0 for tensorflow 2.16 + opencv 4.9) ──
+numpy==1.26.4
+
+# ── OpenCV headless (no GUI, numpy 1.x compatible) ──
+# Do NOT use opencv-python — it requires numpy>=2 from v4.10+
+# Both retina-face and deepface will warn "opencv-python not installed"
+# but they work fine with headless — same cv2 module, just no imshow/GUI
+opencv-python-headless==4.9.0.80
+
+# ── DeepFace + deps (install with --no-deps, see order above) ──
 deepface
+retina-face
+mtcnn
+lightdsa
+lightphe
+
+# ── Supporting libs ──
+Pillow
+tqdm
+pandas
+gdown
+fire
+gunicorn
+flask
+flask-cors
+
+# ── Vector search ──
 faiss-cpu
 
-mtcnn
-retina-face
-
+# ── HTTP / webhook ──
 requests
-pandas
-scikit-learn
 
-python-dotenv
-langchain
-openai
+# ── sqlite3 is built into Python — no install needed ──
