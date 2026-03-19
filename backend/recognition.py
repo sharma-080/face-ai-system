@@ -18,7 +18,7 @@ EMBEDDING_DIM = 512
 # Different people:           0.05–0.30
 # 0.35 is aggressive (fewer missed detections, more false positives)
 # Raise to 0.50 if strangers are being recognized as known people
-COSINE_THRESHOLD = 0.35
+COSINE_THRESHOLD = 0.50
 
 index  = None
 labels = []

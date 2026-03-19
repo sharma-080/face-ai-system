@@ -15,7 +15,8 @@ EMBEDDING_DIM = 512
 
 def save_known_face(name: str, images: list[bytes]) -> list[str]:
     """
-    Save raw image bytes for a person and rebuild the FAISS index.
+    Save raw image bytes for a p
+    erson and rebuild the FAISS index.
     """
     person_dir = os.path.join(KNOWN_DIR, name)
     os.makedirs(person_dir, exist_ok=True)

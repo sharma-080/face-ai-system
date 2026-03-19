@@ -2,7 +2,7 @@ import base64
 import requests
 import socket
 
-WEBHOOK_URL = ""
+WEBHOOK_URL = "https://primary-production-a1dc.up.railway.app/webhook/edge-event"
 DEVICE_ID = socket.gethostname()
 
 
